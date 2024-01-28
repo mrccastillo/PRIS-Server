@@ -2,33 +2,22 @@ const router = require("express").Router();
 
 const db = require("../db");
 
-//edit username
-router.patch("/login", (req, res) => {
+//edit pass
+router.patch("/user/editpass/:userID", (req, res) => {
   //need contact_number and user_password from client
-  const q = "SELECT * FROM usertbl WHERE Contact_Number = ?";
+  const { userID } = req.params;
+  const q = `SELECT * FROM usertbl WHERE UserID = ${userID}`;
+  db.query(q, (err, data) => {
+    if (err) return res.json("Error");
 
-  //   db.query(q, [req.body.Contact_Number], (err, data) => {
-  //     console.log(req.body.Contact_Number);
-  //     if (err) return res.status(418).json("Error: ", err);
-  //     if (data.length < 1) return res.json("user NOT found");
-  //     if (data[0].User_Password === req.body.User_Password)
-  //       return res.json("Logged In!");
-  //     else return res.status(500).json("Incorrect Password");
-  //   });
-});
-
-//edit password
-router.post("/login", (req, res) => {
-  //need contact_number and user_password from client
-  const q = "SELECT * FROM usertbl WHERE Contact_Number = ?";
-
-  db.query(q, [req.body.Contact_Number], (err, data) => {
-    console.log(req.body.Contact_Number);
-    if (err) return res.status(418).json("Error: ", err);
-    if (data.length < 1) return res.json("user NOT found");
-    if (data[0].User_Password === req.body.User_Password)
-      return res.json("Logged In!");
-    else return res.status(500).json("Incorrect Password");
+    db.query(
+      `UPDATE usertbl SET UserPassword = ? WHERE ContactNo = ?`,
+      [req.body.updatePass, req.body.Contact_Number],
+      (err, data) => {
+        if (err) return res.status(418).json("Error: ", err);
+        if (data) return res.status(200).json("You ");
+      }
+    );
   });
 });
 
